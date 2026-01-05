@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  orders    Order[]   @relation("UserOrders")
+  sessions  Session[] @relation("UserSessions")
+
+  @@index([email], map: "idx_user_email")
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[] @relation("OrderItems")
+
+  @@index([name], map: "idx_product_name")
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  userId     Int
+  total      Float
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  user       User        @relation("UserOrders", fields: [userId], references: [id])
+  orderItems OrderItem[] @relation("OrderItems")
+
+  @@index([userId], map: "idx_user_id")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Float
+  order     Order   @relation("OrderItems", fields: [orderId], references: [id])
+  product   Product @relation("OrderItems", fields: [productId], references: [id])
+
+  @@index([orderId], map: "idx_order_id")
+  @@index([productId], map: "idx_product_id")
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation("UserSessions", fields: [userId], references: [id])
+
+  @@index([userId], map: "idx_session_user_id")
+}
