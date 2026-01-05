@@ -85,7 +85,29 @@ async function getOrderById(req, res) {
   }
 }
 
+// Get order by User ID
+async function getOrdersByUserId(req, res) {
+  try {
+    const orders = await prisma.order.findMany({
+      where: { userId: parseInt(req.params.userId) },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    res.json(orders);
+  } catch (error) {
+    console.error("Get orders by User ID error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   createOrder,
   getOrderById,
+  getOrdersByUserId,
 };

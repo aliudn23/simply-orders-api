@@ -79,18 +79,14 @@ async function logout(req, res) {
     return res.status(400).json({ message: "Token is required for logout" });
   }
 
-  // Delete the session with the given token
-  prisma.session
-    .deleteMany({ where: { token } })
-    .then(() => {
-      res.json({ message: "Logout successful" });
-    })
-    .catch((error) => {
-      console.error("Logout error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    });
-
-  res.json({ message: "Logout successful" });
+  try {
+    // Delete the session with the given token
+    await prisma.session.deleteMany({ where: { token } });
+    res.json({ message: "Logout successful" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 }
 
 module.exports = {

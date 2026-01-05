@@ -22,5 +22,6 @@ router.delete("/products/:id", productModule.deleteProduct);
 
 router.post("/orders", orderModule.createOrder);
 router.get("/orders/:id", orderModule.getOrderById);
+router.get("/orders/user/:userId", orderModule.getOrdersByUserId);
 
 module.exports = router;
